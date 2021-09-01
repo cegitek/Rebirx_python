@@ -55,6 +55,18 @@ class TriggerMode(object):
 	EXTERNAL_STACK_TRIGGER 	= "external_stack_trigger"
 
 
+class DetInformation(object):
+	SERIAL_NUMBER 			= "serialNumber"
+	PART_ID 				= "partid"
+	HV_CONSIGNE			 	= "HVConsigne"
+	DAC_HV 					= "DacHV"
+
+class CalibrationType(object):
+	SLOW 				= "0"
+	MEDIUM 				= "1"
+	FAST			 	= "2"
+
+
 class Xpad_Error(BaseException):
 	pass
 
@@ -916,9 +928,9 @@ class XpadCamera:
 	def setWaitingTimeBetweenImage(self,val):
 		self.clearInputMainSocket()
 		self.waitingTime = val
-		self.sock.send(("SetWaitingTimeBetweenImage " + val + "\n").encode())
+		self.sock.send(("SetWaitingTimeBetweenImages " + val + "\n").encode())
 		self.receiveResponse()
-		data = self.recvBuffer.decode()
+		data = self.recvBuffer
 				
 		if int(self.getAckValue(data)) > -1 :
 			return True
@@ -1006,7 +1018,6 @@ class XpadCamera:
 			if tmp[j] == "*" :
 				index = j
 				break
-
 		
 		if(ret.split()[index] == "*"):
 			for i in range(len(ret)):
@@ -1018,6 +1029,52 @@ class XpadCamera:
 		else:
 			raise Xpad_Error("BAD return ACK :",ret)
 		
+	def getDetectorInformations(self,registerName):	
+		self.clearInputMainSocket()
+		self.sock.send(("GetDetInformation " + registerName + "\n").encode())
+		self.receiveResponse()
+		data = self.recvBuffer
+		ret = data.decode()
+		index = 0
 		
+		tmp = ret.split()
+		for j in range (0, len(tmp)-1):
+			if tmp[j] == "*" :
+				index = j
+				break
 		
+		if(ret.split()[index] == "*"):
+			for i in range(len(ret)):
+				if ret[i] == '"':
+					return ret.split('"')[1]
+					
+			return ret.split()[index+1]
+
+		else:
+			raise Xpad_Error("BAD return ACK :",ret)
+		
+
+	def SetDetectorInformations(self,registerName,value):
+		self.clearInputMainSocket()
+		self.sock.send(("SetDetInformation " + registerName + " " + value + "\n").encode())
+		self.receiveResponse()
+		data = self.recvBuffer
+				
+		if int(self.getAckValue(data)) > -1 :
+			return True
+		else:
+			raise Xpad_Error("ERROR: Command not recognized.")
+
+	def SetDacHv(self,val):
+		self.clearInputMainSocket()
+		self.overflowTime = val
+		self.sock.send(("SetHvValue " + str(val) + "\n").encode())
+		self.receiveResponse()
+		data = self.recvBuffer
+			
+		if int(self.getAckValue(data)) > -1 :
+			return True
+		else:
+			raise Xpad_Error("ERROR: Command not recognized.")
+			
 

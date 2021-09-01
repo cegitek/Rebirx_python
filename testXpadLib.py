@@ -20,6 +20,7 @@ from libXpad import Xpad_Error
 from libXpad import AcqMode
 from libXpad import TriggerMode
 from libXpad import OutSignal
+from libXpad import CalibrationType
 
 # This function save raw image in binary int32 by pixels 
 def writeRawFile(FileName, data):
@@ -54,8 +55,8 @@ def expose():
 				#Read Image
 				data = xpad.readOneImage()				
 				#Save image
-				#writeDatFile(FName,xpad.getImageHeight(),xpad.getImageWidth(),data)
-				writeRawFile(FName,data)	
+				writeDatFile(FName,xpad.getImageHeight(),xpad.getImageWidth(),data)
+				#writeRawFile(FName,data)	
 		
 			except Xpad_Error as e:# ABORT DETECTED
 				print (e)
@@ -76,7 +77,7 @@ def expose():
 #*******              start Program                  ******
 #**********************************************************	
 os.system('cls' if os.name=='nt' else 'clear')
-ip_server='localhost'
+ip_server='192.168.0.15'
 port_server=3456
 
 
@@ -193,7 +194,7 @@ while ans:
 			# Make the Over the noise calibration 
 			print("Calibration OTN in progress")
 			try:
-				ret = xpad.calibrationOTN(str(0))
+				ret = xpad.calibrationOTN(CalibrationType.SLOW)
 				if(ret == 0):
 					print("Calibration OTN Done !!!")
 				elif(ret == 1):
@@ -205,7 +206,7 @@ while ans:
 			# Make the Over the noise calibration with pulse recomanded
 			print("Calibration OTN Pulse in progress")
 			try:
-				ret = xpad.calibrationOTNPulse(str(0))
+				ret = xpad.calibrationOTNPulse(CalibrationType.SLOW)
 				if(ret == 0):
 					print("Calibration OTN pulse Done !!!")
 				elif(ret == 1):
@@ -249,7 +250,6 @@ while ans:
 		elif ans=="10":
 			#Save the calibration File
 			Name  = input("What would you like Calibration name : " )
-			print (Name)
 			FileName = "Calib/" + str(Name)
 			try:
 				xpad.saveCalibration(FileName)
@@ -260,7 +260,7 @@ while ans:
 		elif ans=="11":
 			#load the calibration File
 			Name  = input("What would you like Load Calibration name : " )
-			FileName = "Calib/" + str(Name)
+			FileName = "Calib/" + Name
 			print("Load Calibration in progress .....")
 			try:
 				xpad.loadCalibration(FileName) 
@@ -290,7 +290,7 @@ while ans:
 			#check detector status 
 			while 'Idle.' in  detector_status:
 				detector_status = xpad.getDetectorStatus()
-				time.sleep(0.01)
+				time.sleep(0.1)
 				pass
 			
 			while True:
@@ -311,7 +311,7 @@ while ans:
 			for jj in range (0, len(value)-1):
 				print(value[jj].split('=')) # or print(value[jj].split('=')[1])
 				
-			
+
 		elif ans=="0":
 			#Close the menu
 			print("\n Goodbye") 
