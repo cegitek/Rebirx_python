@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Author 	 : Frederic BOMPARD
-# Date		 : 23/07/2019
+# Date		 : 23/08/2021
 # Compatible : RebirX SERVER 
 # email 	 : frederic.bompard@cegitek.com
 # Version	 : 1.6
@@ -159,6 +159,21 @@ class XpadCamera:
 			return True
 		else:
 			raise Xpad_Error("ERROR: No module Connected status socket.")
+
+
+
+	def setDebugMode(self, flag):
+		self.clearInputMainSocket()
+		
+		if flag == True : 
+			str_str = "setdebugmode True\n"
+		else :
+			str_str = "setdebugmode False\n"		
+		self.sock.send(str_str.encode())
+		self.receiveResponse()
+		data = self.recvBuffer
+		return self.getAckValue(data)
+
 
 	def getFirmwareID(self):		
 		self.clearInputMainSocket()
@@ -656,8 +671,13 @@ class XpadCamera:
 				tmp = self.sock_status.recv(BUFFER_SIZE)
 		else:
 			data.decode().replace(">","")
-			
-		return self.getAckValue(data)		
+		
+		try :
+			val = self.getAckValue(data)
+			return val
+		except Exception as e:
+			print(e)
+			return "ERROR STATUS"
 
 
 	def abortCurrentProcess(self):	
@@ -1071,10 +1091,13 @@ class XpadCamera:
 		self.sock.send(("SetHvValue " + str(val) + "\n").encode())
 		self.receiveResponse()
 		data = self.recvBuffer
+		
+		print(data.decode())
 			
 		if int(self.getAckValue(data)) > -1 :
 			return True
 		else:
+			print("ERROR SetDacHV")
 			raise Xpad_Error("ERROR: Command not recognized.")
 			
 
