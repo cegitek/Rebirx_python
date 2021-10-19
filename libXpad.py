@@ -1091,10 +1091,9 @@ class XpadCamera:
 		self.sock.send(("SetHvValue " + str(val) + "\n").encode())
 		self.receiveResponse()
 		data = self.recvBuffer
-		
-		print(data.decode())
 			
 		if int(self.getAckValue(data)) > -1 :
+			self.resetDetector()
 			return True
 		else:
 			print("ERROR SetDacHV")
