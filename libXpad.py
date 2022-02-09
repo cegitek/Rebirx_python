@@ -66,6 +66,15 @@ class CalibrationType(object):
 	MEDIUM 				= "1"
 	FAST			 	= "2"
 
+class Global_Config(object):
+	AMPTP   =  "AMPTP"
+	IMFP    =  "IMFP"
+	ITOA    =  "ITOA"
+	IPRE    =  "IPRE"
+	ITHL    =  "ITHL"
+	ITUNE   =  "ITUNE"
+	IBUFF   =  "IBUFF"
+
 
 class Xpad_Error(BaseException):
 	pass
@@ -106,7 +115,7 @@ class XpadCamera:
 		try:
 			ret = self.sock.recv(1)
 			self.recvBuffer = ret
-			while ret.decode() != ">":				
+			while ret.decode() != ">":
 				ret = self.sock.recv(1)
 				self.recvBuffer += ret
 		except:
@@ -883,7 +892,7 @@ class XpadCamera:
 			value = "true"
 		else:
 			value = "false"
-		self.sock.send(("SetDeadPixelFlag " + value + "\n").encode())
+		self.sock.send(("SetDeadPixelCorrectionFlag " + value + "\n").encode())
 		self.receiveResponse()
 		data = self.recvBuffer
 				
@@ -905,7 +914,7 @@ class XpadCamera:
 			value = "true"
 		else:
 			value = "false"		
-		self.sock.send(("SetNoisyPixelFlag " + value + "\n").encode())
+		self.sock.send(("SetNoisyPixelCorrectionFlag " + value + "\n").encode())
 		self.receiveResponse()
 		data = self.recvBuffer
 		if int(self.getAckValue(data)) > -1 :
