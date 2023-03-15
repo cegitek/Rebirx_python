@@ -832,7 +832,7 @@ class XpadCamera:
 		self.inputSignal = val
 		self.sock.send(("SetInputSignal " + val + "\n").encode())
 		self.receiveResponse()
-		data = self.recvBuffer.decode()
+		data = self.recvBuffer
 		if self.getAckValue(data) == "0" :
 			return True
 		else:
